@@ -55,7 +55,7 @@ public class DbUtils {
     /**
      * Update query to save encrypted client access and refresh token.
      */
-    private final String updateQueryAccessTokens = "UPDATE IDN_OAUTH2_ACCESS_TOKEN SET ACCESS_TOKEN = ?, REFRESH_TOKEN FROM = ? WHERE TOKEN_ID = ?";
+    private final String updateQueryAccessTokens = "UPDATE IDN_OAUTH2_ACCESS_TOKEN SET ACCESS_TOKEN = ?, REFRESH_TOKEN = ? WHERE TOKEN_ID = ?";
 
     /**
      * Database connection.
@@ -161,7 +161,7 @@ public class DbUtils {
                 databaseConnection.setAutoCommit(false);
                 statement.setString(1,convertedaccessToken);
                 statement.setString(2,convertedrefreshToken);
-                statement.setString(2,temptokens.getId());
+                statement.setString(3,temptokens.getId());
                 statement.addBatch();
             }
             int [] execution = statement.executeBatch();

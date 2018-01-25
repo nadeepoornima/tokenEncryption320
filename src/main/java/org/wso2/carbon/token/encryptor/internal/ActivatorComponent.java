@@ -25,6 +25,7 @@ import org.wso2.carbon.identity.core.util.IdentityDatabaseUtil;
 import org.wso2.carbon.token.encryptor.DbUtils;
 import org.wso2.carbon.token.encryptor.IdnOauthApplication;
 import org.wso2.carbon.token.encryptor.IdnAccessToken;
+import org.wso2.carbon.registry.core.service.RegistryService;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -32,6 +33,9 @@ import java.util.List;
 
 /**
  * @scr.component name="org.wso2.carbon.token.encryptor" immediate="true"
+ * @scr.reference name="registry.service"
+ * interface="org.wso2.carbon.registry.core.service.RegistryService" cardinality="0..1"
+ * policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
  */
 
 public class ActivatorComponent {
@@ -58,5 +62,12 @@ public class ActivatorComponent {
         dbUtils.saveApplicationTokens(idnAccessTokenList);
         log.info("--------------------------- Token encoding Completed. ---------------------------");
         connection.close();
+    }
+
+    protected void setRegistryService(RegistryService registryService) {
+        // Do nothing
+    }
+    protected void unsetRegistryService(RegistryService registryService) {
+        // Do nothing
     }
 }
