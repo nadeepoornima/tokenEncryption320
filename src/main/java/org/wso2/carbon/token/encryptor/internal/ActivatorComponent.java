@@ -25,7 +25,7 @@ import org.wso2.carbon.identity.core.util.IdentityDatabaseUtil;
 import org.wso2.carbon.token.encryptor.DbUtils;
 import org.wso2.carbon.token.encryptor.IdnOauthApplication;
 import org.wso2.carbon.token.encryptor.IdnAccessToken;
-import org.wso2.carbon.registry.core.service.RegistryService;
+import org.wso2.carbon.utils.ConfigurationContextService;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -33,9 +33,8 @@ import java.util.List;
 
 /**
  * @scr.component name="org.wso2.carbon.token.encryptor" immediate="true"
- * @scr.reference name="registry.service"
- * interface="org.wso2.carbon.registry.core.service.RegistryService" cardinality="0..1"
- * policy="dynamic" bind="setRegistryService" unbind="unsetRegistryService"
+ * @scr.reference name="config.context.service" interface="org.wso2.carbon.utils.ConfigurationContextService"
+ * cardinality="1..1" policy="dynamic"  bind="setConfigurationContextService" unbind="unsetConfigurationContextService"
  */
 
 public class ActivatorComponent {
@@ -45,7 +44,7 @@ public class ActivatorComponent {
      *
      * @param context OSGi component context.
      */
-    protected void activate(ComponentContext context) throws SQLException {
+        protected void activate(ComponentContext context) throws SQLException {
         if (System.getProperty("xencrypt") == null) {
             return;
         }
@@ -64,10 +63,11 @@ public class ActivatorComponent {
         connection.close();
     }
 
-    protected void setRegistryService(RegistryService registryService) {
+    protected void setConfigurationContextService(ConfigurationContextService registryService) {
+        log.info("Registry Service Found by encryptor");
         // Do nothing
     }
-    protected void unsetRegistryService(RegistryService registryService) {
+    protected void unsetConfigurationContextService(ConfigurationContextService registryService) {
         // Do nothing
     }
 }
