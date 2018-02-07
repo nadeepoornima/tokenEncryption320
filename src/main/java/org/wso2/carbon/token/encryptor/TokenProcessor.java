@@ -35,17 +35,11 @@ public class TokenProcessor {
      * @param token
      * @return
      */
-    public static String getEncryptedToken(String token) {
-        log.debug("Encoding : " + token);
+    public static String getEncryptedToken(String token) throws Exception {
+        log.info("Encoding : " + token);
         byte [] convertedByteToken = token.getBytes(Charset.defaultCharset());
-        try {
-            String convertedToken = CryptoUtil.getDefaultCryptoUtil().encryptAndBase64Encode(convertedByteToken);
-            log.debug("Encoded : " + convertedToken);
-            return convertedToken;
-        } catch (CryptoException e) {
-            log.error("Unable to perform encoding");
-            e.printStackTrace();
-            return null;
-        }
+        String convertedToken = CryptoUtil.getDefaultCryptoUtil().encryptAndBase64Encode(convertedByteToken);
+        log.info("Encoded : " + convertedToken);
+        return convertedToken;
     }
 }

@@ -20,6 +20,7 @@ package org.wso2.carbon.token.encryptor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.core.util.CryptoException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -40,12 +41,12 @@ public class DbUtils {
     /**
      * Select data from database, Related to consumer secrete.
      */
-    private final String selectQueryOauthApps = "SELECT ID, CONSUMER_SECRET FROM IDN_OAUTH_CONSUMER_APPS";
+    private final String selectQueryOauthApps = "SELECT CONSUMER_KEY, CONSUMER_SECRET FROM IDN_OAUTH_CONSUMER_APPS";
 
     /**
      * Update query to save encrypted consumer secrete.
      */
-    private final String updateQueryOauthApps = "UPDATE IDN_OAUTH_CONSUMER_APPS SET CONSUMER_SECRET = ? WHERE ID = ?";
+    private final String updateQueryOauthApps = "UPDATE IDN_OAUTH_CONSUMER_APPS SET CONSUMER_SECRET = ? WHERE CONSUMER_KEY = ?";
 
     /**
      * Select query for access token and refresh tokens.
@@ -110,7 +111,7 @@ public class DbUtils {
             while(resultSet.next())
             {
                 IdnOauthApplication temp = new IdnOauthApplication();
-                temp.setId(resultSet.getString("ID"));
+                temp.setId(resultSet.getString("CONSUMER_KEY"));
                 temp.setClientSecreat(resultSet.getString("CONSUMER_SECRET"));
                 apps.add(temp);
             }
@@ -131,19 +132,26 @@ public class DbUtils {
         try {
             PreparedStatement statement = databaseConnection.prepareStatement(updateQueryOauthApps);
             for(IdnOauthApplication tempapp : idnOauthApplicationList) {
-                String convertedToken = TokenProcessor.getEncryptedToken(tempapp.getClientSecreat());
-                databaseConnection.setAutoCommit(false);
-                statement.setString(1,convertedToken);
-                statement.setString(2,tempapp.getId());
-                statement.addBatch();
+                String convertedToken = null;
+                try {
+                    convertedToken = TokenProcessor.getEncryptedToken(tempapp.getClientSecreat());
+                    databaseConnection.setAutoCommit(false);
+                    statement.setString(1,convertedToken);
+                    statement.setString(2,tempapp.getId());
+                    statement.addBatch();
+                } catch (Exception e) {
+                    log.error("Unable to encrypt Client secrets ");
+                    e.printStackTrace();
+                    databaseConnection.rollback();
+                }
             }
             int [] execution = statement.executeBatch();
             databaseConnection.commit();
             log.info("Client Secrets Converted :" +execution);
         } catch (SQLException e) {
             log.error("Unable to update Client secrets ");
-            databaseConnection.rollback();
             e.printStackTrace();
+            databaseConnection.rollback();
         }
     }
 
@@ -156,13 +164,18 @@ public class DbUtils {
         try {
             PreparedStatement statement = databaseConnection.prepareStatement(updateQueryAccessTokens);
             for(IdnAccessToken temptokens : idnAccessTokens) {
-                String convertedaccessToken = TokenProcessor.getEncryptedToken(temptokens.getAccessToken());
-                String convertedrefreshToken = TokenProcessor.getEncryptedToken(temptokens.getRefreshToken());
-                databaseConnection.setAutoCommit(false);
-                statement.setString(1,convertedaccessToken);
-                statement.setString(2,convertedrefreshToken);
-                statement.setString(3,temptokens.getId());
-                statement.addBatch();
+                try {
+                    String convertedaccessToken = TokenProcessor.getEncryptedToken(temptokens.getAccessToken());
+                    String convertedrefreshToken = TokenProcessor.getEncryptedToken(temptokens.getRefreshToken());
+                    databaseConnection.setAutoCommit(false);
+                    statement.setString(1,convertedaccessToken);
+                    statement.setString(2,convertedrefreshToken);
+                    statement.setString(3,temptokens.getId());
+                    statement.addBatch();
+                } catch (Exception e) {
+                    log.error("Unable to encrypt Client secrets ");
+                    e.printStackTrace();
+                }
             }
             int [] execution = statement.executeBatch();
             databaseConnection.commit();
