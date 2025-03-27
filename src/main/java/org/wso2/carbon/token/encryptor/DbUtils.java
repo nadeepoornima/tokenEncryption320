@@ -29,6 +29,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 
 /**
@@ -36,7 +37,8 @@ import java.util.List;
  */
 public class DbUtils {
 
-    private static final Log log = LogFactory.getLog(DbUtils.class);
+//    private static final Log log = LogFactory.getLog(DbUtils.class);
+    private static final Logger LOGGER = Logger.getLogger(DbUtils.class.getName());
 
     /**
      * Select data from database, Related to consumer secrete.
@@ -92,7 +94,7 @@ public class DbUtils {
             }
             return accessTokens;
         } catch (SQLException e) {
-            log.error("Unable to execute query");
+            LOGGER.info("Error: Unable to execute query");
             e.printStackTrace();
             return null;
         }
@@ -117,7 +119,7 @@ public class DbUtils {
             }
             return apps;
         } catch (SQLException e) {
-            log.error("Unable to execute query");
+            LOGGER.info("Error: Unable to execute query");
             e.printStackTrace();
             return null;
         }
@@ -140,16 +142,16 @@ public class DbUtils {
                     statement.setString(2,tempapp.getId());
                     statement.addBatch();
                 } catch (Exception e) {
-                    log.error("Unable to encrypt Client secrets ");
+                    LOGGER.info("Error: Unable to encrypt Client secrets ");
                     e.printStackTrace();
                     databaseConnection.rollback();
                 }
             }
             int [] execution = statement.executeBatch();
             databaseConnection.commit();
-            log.info("Client Secrets Converted :" +execution);
+            LOGGER.info("Client Secrets Converted :" +execution);
         } catch (SQLException e) {
-            log.error("Unable to update Client secrets ");
+            LOGGER.info("Unable to update Client secrets ");
             e.printStackTrace();
             databaseConnection.rollback();
         }
@@ -173,15 +175,15 @@ public class DbUtils {
                     statement.setString(3,temptokens.getId());
                     statement.addBatch();
                 } catch (Exception e) {
-                    log.error("Unable to encrypt Client secrets ");
+                    LOGGER.info("Error: Unable to encrypt Client secrets ");
                     e.printStackTrace();
                 }
             }
             int [] execution = statement.executeBatch();
             databaseConnection.commit();
-            log.info("Tokens Converted :" +execution);
+            LOGGER.info("Tokens Converted :" +execution);
         } catch (SQLException e) {
-            log.error("Unable to update Tokens ");
+            LOGGER.info("Error: Unable to update Tokens ");
             databaseConnection.rollback();
             e.printStackTrace();
         }

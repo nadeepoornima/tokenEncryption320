@@ -26,6 +26,7 @@ import org.wso2.carbon.token.encryptor.DbUtils;
 import org.wso2.carbon.token.encryptor.IdnOauthApplication;
 import org.wso2.carbon.token.encryptor.IdnAccessToken;
 import org.wso2.carbon.utils.ConfigurationContextService;
+import java.util.logging.Logger;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -38,7 +39,7 @@ import java.util.List;
  */
 
 public class ActivatorComponent {
-    private static final Log log = LogFactory.getLog(ActivatorComponent.class);
+    private static final Logger LOGGER = Logger.getLogger(ActivatorComponent.class.getName());
     /**
      * Method to activate bundle.
      *
@@ -48,23 +49,23 @@ public class ActivatorComponent {
         if (System.getProperty("xencrypt") == null) {
             return;
         }
-        log.info("Token Encryptor activates");
+            LOGGER.info("Token Encryptor activates");
         Connection connection = IdentityDatabaseUtil.getDBConnection();
         connection.setAutoCommit(false);
         DbUtils dbUtils = new DbUtils(connection);
         List<IdnOauthApplication> idnOauthApplicationList = dbUtils.getOauthAppsList();
         List<IdnAccessToken> idnAccessTokenList = dbUtils.getAccessTokenList();
-        log.info("--------------------------- Client secrets encoding started. ---------------------------");
+        LOGGER.info("--------------------------- Client secrets encoding started. ---------------------------");
         dbUtils.saveClientSecret(idnOauthApplicationList);
-        log.info("--------------------------- Client secrets encoding Completed. ---------------------------");
-        log.info("--------------------------- Token encoding started. ---------------------------");
+        LOGGER.info("--------------------------- Client secrets encoding Completed. ---------------------------");
+        LOGGER.info("--------------------------- Token encoding started. ---------------------------");
         dbUtils.saveApplicationTokens(idnAccessTokenList);
-        log.info("--------------------------- Token encoding Completed. ---------------------------");
+        LOGGER.info("--------------------------- Token encoding Completed. ---------------------------");
         connection.close();
     }
 
     protected void setConfigurationContextService(ConfigurationContextService registryService) {
-        log.info("Registry Service Found by encryptor");
+        LOGGER.info("Registry Service Found by encryptor");
         // Do nothing
     }
     protected void unsetConfigurationContextService(ConfigurationContextService registryService) {

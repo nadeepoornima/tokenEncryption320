@@ -23,12 +23,14 @@ import org.wso2.carbon.core.util.CryptoException;
 import org.wso2.carbon.core.util.CryptoUtil;
 
 import java.nio.charset.Charset;
+import java.util.logging.Logger;
 
 /**
  * Encrypt given value using Crypto Utils.
  */
 public class TokenProcessor {
-    private static final Log log = LogFactory.getLog(TokenProcessor.class);
+//    private static final Log log = LogFactory.getLog(TokenProcessor.class);
+    private static final Logger LOGGER = Logger.getLogger(TokenProcessor.class.getName());
 
     /**
      * Encrypt and return provided string.
@@ -36,10 +38,10 @@ public class TokenProcessor {
      * @return
      */
     public static String getEncryptedToken(String token) throws Exception {
-        log.info("Encoding : " + token);
+        LOGGER.info("Encoding : " + token);
         byte [] convertedByteToken = token.getBytes(Charset.defaultCharset());
         String convertedToken = CryptoUtil.getDefaultCryptoUtil().encryptAndBase64Encode(convertedByteToken);
-        log.info("Encoded : " + convertedToken);
+        LOGGER.info("Encoded : " + convertedToken);
         return convertedToken;
     }
 }
