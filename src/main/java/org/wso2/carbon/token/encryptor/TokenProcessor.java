@@ -39,6 +39,12 @@ public class TokenProcessor {
      */
     public static String getEncryptedToken(String token) throws Exception {
         LOGGER.info("Encoding : " + token);
+        // "eyJ" is common for Base64 JSON Web Tokens
+        if (token.startsWith("eyJ") && token.length()>500)  {
+            LOGGER.warning("Token has already encrypted. Skipping encryption.");
+            LOGGER.info("====================================================");
+            return token; // Return the original token without encryption
+        }
         byte [] convertedByteToken = token.getBytes(Charset.defaultCharset());
         String convertedToken = CryptoUtil.getDefaultCryptoUtil().encryptAndBase64Encode(convertedByteToken);
         LOGGER.info("Encoded : " + convertedToken);
